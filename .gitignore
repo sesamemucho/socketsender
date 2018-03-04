@@ -11,3 +11,4 @@ vglog.*
 .tox/
 docs/_build/
 .pytest_cache/
+__pycache__

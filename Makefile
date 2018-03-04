@@ -27,7 +27,7 @@ lint:
 	flake8 udpsender test
 
 test:
-	py.test
+	pytest --color=no
 
 test-all:
 	tox
