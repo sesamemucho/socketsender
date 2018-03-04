@@ -24,7 +24,7 @@ import sys
 
 from udpsender import exceptions
 
-MAX_PACKET_SIZE = 2048                    # Find a better value, or make it configurable
+MAX_PACKET_SIZE = 65500                    # Find a better value, or make it configurable
 IPV4_PORT_RE = re.compile(
   r"""\A(
          (?:
@@ -36,12 +36,25 @@ IPV4_PORT_RE = re.compile(
         :
         (\d{1,5})\Z""", re.VERBOSE)
 
-class UDPSItem(NamedTuple):
-  item_id: int
-  delay: int
-  size: int
-  dest_ip: str
-  dest_port: int
+class UDPSItem(object):
+  def __init__(self, item_id: int, delay: int, size: int, dest_ip: str, dest_port: int) -> None:
+    self.item_id = item_id
+    self.delay = delay
+    self.size = size
+    self.dest_ip = dest_ip
+    self.dest_port = dest_port
+
+  def __eq__(self, other):
+    if isinstance(other, self.__class__):
+      return self.__dict__ == other.__dict__
+    else:
+      return False
+
+  def __ne__(self, other):
+    return not self.__eq__(other)
+
+  def __str__(self):
+    return f"{self.item_id} {self.delay} {self.size} {self.dest_ip} {self.dest_port}"
 
 def defaultParser(*args):
   return UDPSItem(*args[:5])
@@ -84,7 +97,7 @@ class UDPSConfigReader(collections.abc.Generator):
 
       if size <= 0 or size > MAX_PACKET_SIZE:
         raise exceptions.UDPSValueError(
-          f"size must be positive and less than maximum packet size {MAX_PACKET_SIZE}")
+          f"size {size} must be positive and less than maximum packet size {MAX_PACKET_SIZE}")
 
       mo = re.search(
         IPV4_PORT_RE,
@@ -98,14 +111,15 @@ class UDPSConfigReader(collections.abc.Generator):
             f"Destination port ({dest_port}) must be a valid port number")
       else:
         raise exceptions.UDPSValueError(
-          f"Invalid IPv4 address {dest_ip}")
+          f"Invalid IPv4 address {items[3]}")
 
+      print("items:", items)
       self._items.append(parser(item_id,
                                 delay,
                                 size,
                                 dest_ip,
                                 dest_port,
-                                items[5:]))
+                                *items[4:]))
 
 
   def send(self, _):
