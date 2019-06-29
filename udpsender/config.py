@@ -14,7 +14,6 @@ More fields may be consumed by a config plugin.
 
 """
 
-from typing import NamedTuple
 import collections.abc
 import logging
 import pprint
