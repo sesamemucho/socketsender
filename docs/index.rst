@@ -17,6 +17,9 @@ Contents:
    authors
    history
 
+   udpsender
+   modules
+
 Feedback
 ========
 

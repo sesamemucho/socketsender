@@ -1,10 +1,13 @@
 """Exceptions for udpsender module
 """
 
+
 class UDPSException(Exception):
-  """Base UDPSender exception"""
-  def __init__(self, msg):
-    super().__init__(msg)
+    """Base UDPSender exception"""
+
+    def __init__(self, msg):
+        super().__init__(msg)
+
 
 class UDPSValueError(UDPSException, ValueError):
-  pass
+    pass

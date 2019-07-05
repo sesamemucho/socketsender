@@ -1,4 +1,4 @@
-.PHONY: help clean clean-pyc clean-build list test test-all coverage docs release sdist
+.PHONY: help clean clean-pyc clean-build list test test-all coverage docs release sdist wheel
 
 help:
 	@echo "clean-build - remove build artifacts"
@@ -41,10 +41,10 @@ coverage:
 docs:
 	rm -f docs/udpsender.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ udpsender
+	sphinx-apidoc -o docs/ src/udpsender
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
-	open docs/_build/html/index.html
+#	open docs/_build/html/index.html
 
 release: clean
 	python setup.py sdist upload
@@ -54,3 +54,6 @@ sdist: clean
 	python setup.py sdist
 	python setup.py bdist_wheel upload
 	ls -l dist
+
+wheel: clean
+	python setup.py bdist_wheel

@@ -7,8 +7,14 @@ vglog.*
 *~
 *.bak
 *.eld
-.venv/
+.venv*/
 .tox/
 docs/_build/
 .pytest_cache/
 __pycache__
+src/udpsender.egg-info/
+docs/modules.rst
+docs/udpsender.rst
+.mypy_cache/
+build/
+dist/
