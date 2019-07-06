@@ -13,11 +13,8 @@ following properties:
 name
   The name of this schedule. It is used in reporting,
 
-target_ip
-  IP address used to construct target address.
-
-target_port
-  Port number used to construct target address.
+target_addr
+  IPV4 address:port address used as the destination of the UDP packets.
 
 frequency
   In units of packets per second. It may be an integer or the name of
@@ -70,7 +67,7 @@ import re
 import sys
 import typing
 
-from udpsender import exceptions
+from udpsender import exceptions as uexc
 
 MAX_PACKET_SIZE = 65500  # Find a better value, or make it configurable
 IPV4_PORT_RE = re.compile(
@@ -86,9 +83,38 @@ IPV4_PORT_RE = re.compile(
     re.VERBOSE,
 )
 
+def validate_and_extract_ipaddr(s: str) -> typing.Tuple[str, int]:
+    mo = IPV4_PORT_RE.match(s)
+    if mo:
+        return (mo.group(1), int(mo.group(2)))
+    else:
+        raise ValueError(f"Can't interpret \"{s}\" as IPV4 addr:port")
 
-class UDPSConfig():
-    max_packet_size: int = 65500
+builtin_sources = ('random', 'sequential')
 
-    def __init__(self, stream: typing.TextIO) -> None:
-        pass
+class UDPSSchedule:
+    def __init__(self, data: dict) -> None:
+        validated = schema.validate(data)
+        self.name = validated['name']
+        self.ip_addr = validated['target_addr']
+
+
+
+from schema import Schema, And, Use, Optional, Regex, Const, Or
+
+schema = Schema({'name': And(str, len),
+#                  'target_addr':  Regex(IPV4_PORT_RE),
+                  'target_addr':  Use(validate_and_extract_ipaddr),
+                  'frequency': Or(Const(And(Use(int), lambda n: 0 < n)), callable),
+                  'length': Or('all', And(Use(int), lambda n: 0 < n)),
+                  'source': Or(*builtin_sources, callable),
+                  'total': Or('infinity', And(Use(int), lambda n: 0 < n)),
+                  Optional('delay'): And(Or(int, float), Use(float),
+                                         lambda f: f > 0.0)
+                  })
+
+def get_schedules(stream: typing.TextIO) -> typing.List[UDPSSchedule]:
+    max_packet_size = 65500
+    data: list = yaml.safe_load(stream)
+    return [UDPSSchedule(i) for i in data]
+
