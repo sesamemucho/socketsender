@@ -8,7 +8,7 @@ UDP Packet Sender
 .. image:: https://travis-ci.org/sesamemucho/udpsender.png?branch=master
     :target: https://travis-ci.org/sesamemucho/udpsender
 
-Send diffent-sized UDP packets to various places on a schedule.
+Send different-sized UDP packets to various places one or more schedules.
 
 
 Features
