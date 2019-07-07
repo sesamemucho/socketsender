@@ -1,4 +1,4 @@
-.PHONY: help clean clean-pyc clean-build list test test-all coverage docs release sdist wheel
+.PHONY: help clean clean-pyc clean-build list isort test test-all black docs release sdist wheel
 
 help:
 	@echo "clean-build - remove build artifacts"
@@ -6,7 +6,7 @@ help:
 	@echo "lint - check style with flake8"
 	@echo "test - run tests quickly with the default Python"
 	@echo "test-all - run tests on every Python version with tox"
-	@echo "coverage - check code coverage quickly with the default Python"
+	@echo "format - format code using black"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
 	@echo "release - package and upload a release"
 	@echo "sdist - package"
@@ -27,16 +27,16 @@ lint:
 	flake8 udpsender test
 
 test:
-	pytest --color=no
+	pytest --color=no --cov-report term-missing --cov=src --cov=tests tests
+
+isort:
+	isort --check-only --diff --recursive --skip .tox --skip .venv --skip build -m 3 -tc
 
 test-all:
 	tox
 
-coverage:
-	coverage run --source udpsender setup.py test
-	coverage report -m
-	coverage html
-	open htmlcov/index.html
+format:
+	black tests src
 
 docs:
 	rm -f docs/udpsender.rst

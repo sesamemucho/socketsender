@@ -1,8 +1,8 @@
 .project
 .projectile
+.coverage
 bin/
 *.dat
-vglog.*
 *.tmp
 *~
 *.bak

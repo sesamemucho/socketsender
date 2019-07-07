@@ -10,4 +10,5 @@ class UDPSException(Exception):
 
 
 class UDPSValueError(UDPSException, ValueError):
-    pass
+    def __init__(self, msg):
+        super().__init__(msg)

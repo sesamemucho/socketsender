@@ -21,7 +21,7 @@ class NextBuffer:
 class DefaultWrapper:
     def __init__(self, src_socket=None):
         self.next_buffer = NextBuffer()
-        #self.src_socket = src_socket()
+        # self.src_socket = src_socket()
 
     def send(self, cfg):
         data = self.next_buffer.get(cfg.size)
