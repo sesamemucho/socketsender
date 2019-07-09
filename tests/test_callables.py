@@ -28,7 +28,7 @@ def test_genrandom():
     sch = sched[0]
     assert sch.source == udpcalls.gen_random
 
-    bstring = sch.source(sch.length)
+    bstring = sch.source(sch, sch.length)
 
     assert len(bstring) == 100
 
@@ -50,7 +50,7 @@ def test_genrandom_lenNone():
     sch = sched[0]
     assert sch.source == udpcalls.gen_random
 
-    bstring = sch.source(sch.length)
+    bstring = sch.source(sch, sch.length)
 
     assert len(bstring) == 128
 
@@ -70,9 +70,9 @@ def test_gensequential():
     )
 
     sch = sched[0]
-    assert sch.source == udpcalls.gen_sequential
+    assert isinstance(sch.source, udpcalls.UDPS_SequentialSource)
 
-    bstring = sch.source(sch.length)
+    bstring = sch.source(sch, sch.length)
 
     assert len(bstring) == 140
 
@@ -92,8 +92,8 @@ def test_gensequential_lenNone():
     )
 
     sch = sched[0]
-    assert sch.source == udpcalls.gen_sequential
+    assert isinstance(sch.source, udpcalls.UDPS_SequentialSource)
 
-    bstring = sch.source(sch.length)
+    bstring = sch.source(sch, sch.length)
 
     assert len(bstring) == 128

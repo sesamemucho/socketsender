@@ -1,6 +1,6 @@
 __author__ = "Bob Forgey"
 __email__ = "sesamemucho@grumpydogconsulting.com"
-__version__ = "0.1.0"
+__version__ = "0.1.0.2"
 
 import logging
 

@@ -62,14 +62,11 @@ total
 """
 
 import importlib
-import logging
-import pprint
 import re
-import sys
 import typing
 
 import yaml
-from schema import And, Const, Optional, Or, Regex, Schema, Use
+from schema import And, Const, Optional, Or, Schema, Use
 
 from udpsender import callables
 from udpsender import exceptions as uexc
@@ -99,7 +96,7 @@ def validate_and_extract_ipaddr(s: str) -> typing.Tuple[str, int]:
 
 builtin_sources = {
     "random": callables.gen_random,
-    "sequential": callables.gen_sequential,
+    "sequential": callables.UDPS_SequentialSource(),
 }
 
 
@@ -127,37 +124,83 @@ class UDPSSchedule:
         self.name = validated["name"]
         self.ip_addr = validated["target_addr"]
         self.frequency = validated["frequency"]
-        length = validated["length"]
+        self.length = self.validate_length(validated)
+        self.source = validated["source"]
+        self.total = self.validate_total(validated)
+
+        if "delay" in validated:
+            self.delay = validated["delay"]
+        else:
+            self.delay = 0.0
+
+        self.user_data = dict()
+
+        if "user_data1" in validated:
+            self.user_data["user_data1"] = validated["user_data1"]
+
+        if "user_data2" in validated:
+            self.user_data["user_data2"] = validated["user_data2"]
+
+    def validate_length(self, schema_data):
+        """`length` can have a special value of `none`.
+        """
+        length = schema_data["length"]
         if length == "none":
-            self.length = None
+            retval = None
             # def length_compare(self, ll: typing.Optional[int]) -> bool:
-            def length_compare(self, ll: int) -> bool:
+
+            def length_compare(_, _x: int) -> bool:
                 return False
 
         else:
-            self.length = length
+            retval = length
 
-            def length_compare(self, ll: int) -> bool:
-                return ll < length
+            def length_compare(_, current_length: int) -> bool:
+                return current_length < length
 
         setattr(UDPSSchedule, "length_compare", length_compare)
-        self.source = validated["source"]
 
-        total = validated["total"]
+        return retval
+
+    def validate_total(self, schema_data):
+        """`total` can have a special value of `infinity`.
+        """
+        total = schema_data["total"]
         if total == "infinity":
-            self.total = None
+            retval = None
             # def length_compare(self, ll: typing.Optional[int]) -> bool:
-            def total_compare(self, ll: int) -> bool:
+
+            def total_compare(_, _x: int) -> bool:
                 return False
 
         else:
-            self.total = total
+            retval = total
 
-            def total_compare(self, ll: int) -> bool:
-                return ll < total
+            def total_compare(_, current_total: int) -> bool:
+                return current_total < total
 
         setattr(UDPSSchedule, "total_compare", total_compare)
 
+        return retval
+
+
+    def __str__(self):
+        retval = [f"UDPSchedule \"{self.name}\" is:",
+                  f"    target_addr: {self.ip_addr}",
+                  f"    frequency:   {self.frequency} packets/sec",
+                  f"    length:      {self.length} bytes/packet",
+                  f"    source:      {self.source.__name__}",
+                  f"    total:       {self.total} bytes for all packets",
+                  f"    delay:       {self.delay} sec"]
+        udat = list()
+        if "user_data1" in self.user_data:
+            udat.append(f"    user_data1 is \"{user_data1}\"")
+        if "user_data2" in self.user_data:
+            udat.append(f"    user_data2 is \"{user_data2}\"")
+        if not udat:
+            udat.append(f"    No user data has been defined")
+        retval.extend(udat)
+        return "\n".join(retval)
 
 schema = Schema(
     {
@@ -168,11 +211,13 @@ schema = Schema(
         "source": Or(Use(to_source), Use(from_callable)),
         "total": Or("infinity", And(Use(int), lambda n: 0 < n)),
         Optional("delay"): And(Or(int, float), Use(float), lambda f: f > 0.0),
+        Optional("user_data1"): str,
+        Optional("user_data2"): str,
     }
 )
 
 
 def get_schedules(stream: typing.TextIO) -> typing.List[UDPSSchedule]:
-    max_packet_size = 65500
+    # max_packet_size = 65500
     data: list = yaml.safe_load(stream)
     return [UDPSSchedule(i) for i in data]

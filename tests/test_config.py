@@ -32,6 +32,8 @@ def test_ok():
     assert sch.length == 100
     assert sch.source == udpcalls.gen_random
     assert sch.total == 1000
+    assert sch.delay == pytest.approx(0.0)
+    assert sch.user_data == dict()
 
     assert sch.length_compare(99) is True
     assert sch.length_compare(100) is False
@@ -64,7 +66,7 @@ def test_source():
     assert sch.source.__name__ == "tst1"
     assert sch.total == 1000
 
-    assert sch.source(sch.length) == b"Hello"
+    assert sch.source(sch, sch.length) == b"Hello"
 
 
 def test_length():
@@ -119,6 +121,95 @@ def test_total():
     assert sch.total == None
 
     assert sch.total_compare(9999999999999) is False
+
+
+def test_delay():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "1.1.1.1:44"
+  frequency: 1
+  length: 100
+  source: random
+  total: 1000
+  delay: 4.2
+...
+        """
+    )
+
+    sch = sched[0]
+    assert sch.name == "foo"
+    assert sch.ip_addr == ("1.1.1.1", 44)
+    assert sch.frequency == 1
+    assert sch.length == 100
+    assert sch.source == udpcalls.gen_random
+    assert sch.total == 1000
+    assert sch.delay == pytest.approx(4.2)
+
+    assert sch.length_compare(99) is True
+    assert sch.length_compare(100) is False
+
+    assert sch.total_compare(999) is True
+    assert sch.total_compare(1000) is False
+
+
+def test_user_data1():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "1.1.1.1:44"
+  frequency: 1
+  length: 100
+  source: random
+  total: 1000
+  user_data1: yep
+...
+        """
+    )
+
+    sch = sched[0]
+    assert sch.user_data == {"user_data1": "yep"}
+
+
+def test_user_data2():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "1.1.1.1:44"
+  frequency: 1
+  length: 100
+  source: random
+  total: 1000
+  user_data2: nope
+...
+        """
+    )
+
+    sch = sched[0]
+    assert sch.user_data == {"user_data2": "nope"}
+
+
+def test_user_data3():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "1.1.1.1:44"
+  frequency: 1
+  length: 100
+  source: random
+  total: 1000
+  user_data2: satisfactory
+  user_data1: pfui!
+...
+        """
+    )
+
+    sch = sched[0]
+    assert sch.user_data == {"user_data1": "pfui!", "user_data2": "satisfactory"}
 
 
 def test_badIP1():

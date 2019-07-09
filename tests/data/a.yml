@@ -1,0 +1,8 @@
+---
+- name: foo
+  target_addr: "1.1.1.1:44"
+  frequency: 1
+  length: 100
+  source: random
+  total: 1000
+...

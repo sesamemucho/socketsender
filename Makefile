@@ -24,7 +24,7 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 lint:
-	flake8 udpsender test
+	flake8 src test
 
 test:
 	pytest --color=no --cov-report term-missing --cov=src --cov=tests tests

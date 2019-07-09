@@ -1,28 +1,33 @@
 import array
 import random
 
-SEQUENTIAL_VALUE = 0
 
-
-def gen_random(length: int) -> bytes:
+def gen_random(_: object, length: int, **kwds) -> bytes:
+    """Generates a bytestring of ramdom values.
+    """
     if length is None:
         length = 128
 
     retval = array.array("B")
-    for i in range(0, length):
+    for _ in range(0, length):
         retval.append(random.randrange(0, 256))
 
     return retval.tobytes()
 
 
-def gen_sequential(length: int) -> bytes:
-    global SEQUENTIAL_VALUE
-    if length is None:
-        length = 128
+class UDPS_SequentialSource:
+    def __init__(self):
+        self.starting_value = 0
 
-    retval = array.array("B")
-    for i in range(0, length):
-        retval.append(SEQUENTIAL_VALUE)
-        SEQUENTIAL_VALUE = (SEQUENTIAL_VALUE + 1) % 256
+    def __call__(self, _: object, length: int, **kwds) -> bytes:
+        """Generates a bytestring of sequential values.
+        """
+        if length is None:
+            length = 128
 
-    return retval.tobytes()
+        retval = array.array("B")
+        for _ in range(0, length):
+            retval.append(self.starting_value)
+            self.starting_value = (self.starting_value + 1) % 256
+
+        return retval.tobytes()

@@ -2,5 +2,5 @@
 """
 
 
-def tst1(s):
+def tst1(o, s):
     return b"Hello"
