@@ -16,7 +16,8 @@ def test_genrandom():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: random
@@ -38,7 +39,8 @@ def test_genrandom_lenNone():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: none
   source: random
@@ -60,7 +62,8 @@ def test_gensequential():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 140
   source: sequential
@@ -82,7 +85,8 @@ def test_gensequential_lenNone():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: none
   source: sequential

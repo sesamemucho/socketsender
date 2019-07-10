@@ -2,6 +2,7 @@
 Tests for `udpsender.config` module.
 """
 import io
+import ipaddress
 import pprint
 
 import pytest
@@ -16,7 +17,8 @@ def test_ok():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: random
@@ -27,7 +29,9 @@ def test_ok():
 
     sch = sched[0]
     assert sch.name == "foo"
-    assert sch.ip_addr == ("1.1.1.1", 44)
+    assert sch.tgt_addr == ipaddress.IPv4Address("1.1.1.1")
+    assert sch.tgt_port == 44
+    assert sch.ip_addr == (ipaddress.IPv4Address("1.1.1.1"), 44)
     assert sch.frequency == 1
     assert sch.length == 100
     assert sch.source == udpcalls.gen_random
@@ -49,7 +53,8 @@ def test_source():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: tests.callables.tst1
@@ -60,7 +65,8 @@ def test_source():
 
     sch = sched[0]
     assert sch.name == "foo"
-    assert sch.ip_addr == ("1.1.1.1", 44)
+    assert sch.tgt_addr == ipaddress.IPv4Address("1.1.1.1")
+    assert sch.tgt_port == 44
     assert sch.frequency == 1
     assert sch.length == 100
     assert sch.source.__name__ == "tst1"
@@ -76,7 +82,8 @@ def test_length():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: none
   source: tests.callables.tst1
@@ -87,7 +94,8 @@ def test_length():
 
     sch = sched[0]
     assert sch.name == "foo"
-    assert sch.ip_addr == ("1.1.1.1", 44)
+    assert sch.tgt_addr == ipaddress.IPv4Address("1.1.1.1")
+    assert sch.tgt_port == 44
     assert sch.frequency == 1
     assert sch.length is None
     assert sch.source.__name__ == "tst1"
@@ -103,7 +111,8 @@ def test_total():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: tests.callables.tst1
@@ -114,7 +123,8 @@ def test_total():
 
     sch = sched[0]
     assert sch.name == "foo"
-    assert sch.ip_addr == ("1.1.1.1", 44)
+    assert sch.tgt_addr == ipaddress.IPv4Address("1.1.1.1")
+    assert sch.tgt_port == 44
     assert sch.frequency == 1
     assert sch.length is 100
     assert sch.source.__name__ == "tst1"
@@ -128,7 +138,8 @@ def test_delay():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: random
@@ -140,7 +151,8 @@ def test_delay():
 
     sch = sched[0]
     assert sch.name == "foo"
-    assert sch.ip_addr == ("1.1.1.1", 44)
+    assert sch.tgt_addr == ipaddress.IPv4Address("1.1.1.1")
+    assert sch.tgt_port == 44
     assert sch.frequency == 1
     assert sch.length == 100
     assert sch.source == udpcalls.gen_random
@@ -154,12 +166,124 @@ def test_delay():
     assert sch.total_compare(1000) is False
 
 
+def test_ipv6addr():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "2001:db8::1"
+  target_port: 44
+  frequency: 1
+  length: 100
+  source: random
+  total: 1000
+...
+        """
+    )
+
+    sch = sched[0]
+    assert sch.name == "foo"
+    assert sch.tgt_addr == ipaddress.IPv6Address("2001:db8::1")
+    assert sch.tgt_port == 44
+
+
+def test_str():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "2001:db8::1"
+  target_port: 44
+  frequency: 1
+  length: 100
+  source: random
+  total: 1000
+  user_data1: yep
+  user_data2: nope
+...
+        """
+    )
+
+    sch = sched[0]
+    assert f"{sch}" == """UDPSchedule "foo" is:
+    target_addr: 2001:db8::1
+    target_port: 44
+    frequency:   1 packets/sec
+    length:      100 bytes/packet
+    source:      gen_random
+    total:       1000 bytes for all packets
+    delay:       0.0 sec
+    user_data1 is "yep"
+    user_data2 is "nope"
+"""
+
+
+def test_str():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "2001:db8::1"
+  target_port: 44
+  frequency: 1
+  length: 100
+  source: random
+  total: 1000
+  user_data1: yep
+  user_data2: nope
+...
+        """
+    )
+
+    sch = sched[0]
+    assert f"{sch}" == """UDPSchedule "foo" is:
+    target_addr: 2001:db8::1
+    target_port: 44
+    frequency:   1 packets/sec
+    length:      100 bytes/packet
+    source:      gen_random
+    total:       1000 bytes for all packets
+    delay:       0.0 sec
+    user_data1 is "yep"
+    user_data2 is "nope"
+"""
+
+
+def test_str_nouserdata():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "2001:db8::1"
+  target_port: 44
+  frequency: 1
+  length: 100
+  source: random
+  total: 1000
+...
+        """
+    )
+
+    sch = sched[0]
+    assert f"{sch}" == """UDPSchedule "foo" is:
+    target_addr: 2001:db8::1
+    target_port: 44
+    frequency:   1 packets/sec
+    length:      100 bytes/packet
+    source:      gen_random
+    total:       1000 bytes for all packets
+    delay:       0.0 sec
+    No user data has been defined
+"""
+
+
 def test_user_data1():
     sched = config.get_schedules(
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: random
@@ -178,7 +302,8 @@ def test_user_data2():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: random
@@ -197,7 +322,8 @@ def test_user_data3():
         """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: random
@@ -220,7 +346,8 @@ def test_badIP1():
             """
 ---
 - name: foo
-  target_addr: "1.1.1.zoo:2"
+  target_addr: "1.1.1.zoo"
+  target_port: 2
   frequency: 1
   length: 100
   source: random
@@ -238,7 +365,8 @@ def test_badfrequency():
             """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: -1
   length: 100
   source: random
@@ -256,7 +384,8 @@ def test_badlength():
             """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 0
   source: random
@@ -274,7 +403,8 @@ def test_badsource():
             """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: wut
@@ -292,7 +422,8 @@ def test_badtotal1():
             """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: random
@@ -310,7 +441,8 @@ def test_badtotal2():
             """
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "1.1.1.1"
+  target_port: 44
   frequency: 1
   length: 100
   source: random

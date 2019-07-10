@@ -23,9 +23,9 @@ class UDPSrunner(threading.Thread):
 
     def run(self):
         self.run_request.wait()
-        this_time = datetime.datetime.utcnow()
         i = 0
         time.sleep(self.schedule.delay)
+        this_time = datetime.datetime.utcnow()
         while not self.quitquit.is_set():
             print(f"Hello from {self.name}")
             i += 1

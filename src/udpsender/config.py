@@ -14,7 +14,10 @@ name
   The name of this schedule. It is used in reporting,
 
 target_addr
-  IPV4 address:port address used as the destination of the UDP packets.
+  IP address address used as the destination of the UDP packets.
+
+target_port
+  IP port number used as the destination of the UDP packets.
 
 frequency
   In units of packets per second. It may be an integer or the name of
@@ -62,6 +65,7 @@ total
 """
 
 import importlib
+import ipaddress
 import re
 import typing
 
@@ -72,26 +76,6 @@ from udpsender import callables
 from udpsender import exceptions as uexc
 
 MAX_PACKET_SIZE = 65500  # Find a better value, or make it configurable
-IPV4_PORT_RE = re.compile(
-    r"""\A(
-         (?:
-            (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?
-            )\.
-          ){3}
-         (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)
-        )
-        :
-        (\d{1,5})\Z""",
-    re.VERBOSE,
-)
-
-
-def validate_and_extract_ipaddr(s: str) -> typing.Tuple[str, int]:
-    mo = IPV4_PORT_RE.match(s)
-    if mo:
-        return (mo.group(1), int(mo.group(2)))
-    else:
-        raise uexc.UDPSValueError(f'Can\'t interpret "{s}" as IPV4 addr:port')
 
 
 builtin_sources = {
@@ -122,7 +106,9 @@ class UDPSSchedule:
 
         validated = schema.validate(data)
         self.name = validated["name"]
-        self.ip_addr = validated["target_addr"]
+        self.tgt_addr = validated["target_addr"]
+        self.tgt_port = validated["target_port"]
+        self.ip_addr = (self.tgt_addr, self.tgt_port)
         self.frequency = validated["frequency"]
         self.length = self.validate_length(validated)
         self.source = validated["source"]
@@ -186,7 +172,8 @@ class UDPSSchedule:
 
     def __str__(self):
         retval = [f"UDPSchedule \"{self.name}\" is:",
-                  f"    target_addr: {self.ip_addr}",
+                  f"    target_addr: {self.tgt_addr}",
+                  f"    target_port: {self.tgt_port}",
                   f"    frequency:   {self.frequency} packets/sec",
                   f"    length:      {self.length} bytes/packet",
                   f"    source:      {self.source.__name__}",
@@ -194,18 +181,19 @@ class UDPSSchedule:
                   f"    delay:       {self.delay} sec"]
         udat = list()
         if "user_data1" in self.user_data:
-            udat.append(f"    user_data1 is \"{user_data1}\"")
+            udat.append(f"    user_data1 is \"{self.user_data['user_data1']}\"")
         if "user_data2" in self.user_data:
-            udat.append(f"    user_data2 is \"{user_data2}\"")
+            udat.append(f"    user_data2 is \"{self.user_data['user_data2']}\"")
         if not udat:
             udat.append(f"    No user data has been defined")
         retval.extend(udat)
-        return "\n".join(retval)
+        return "\n".join(retval) + "\n"
 
 schema = Schema(
     {
         "name": And(str, len),
-        "target_addr": Use(validate_and_extract_ipaddr),
+        "target_addr": Use(ipaddress.ip_address),
+        "target_port": And(Use(int), lambda n: 0 <= n <= 65535),
         "frequency": Or(callable, Const(And(Use(int), lambda n: 0 < n))),
         "length": Or("none", And(Use(int), lambda n: 0 < n)),
         "source": Or(Use(to_source), Use(from_callable)),
