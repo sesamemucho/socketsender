@@ -1,7 +1,8 @@
 """Sends UDP packets on a schedule.
 """
 
-import datetime
+import ipaddress
+import socket
 import threading
 import time
 import typing
@@ -24,13 +25,17 @@ class UDPSrunner(threading.Thread):
     def run(self):
         self.run_request.wait()
         i = 0
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
         time.sleep(self.schedule.delay)
-        this_time = datetime.datetime.utcnow()
+        this_time = time.time()
+        out = 0
         while not self.quitquit.is_set():
-            print(f"Hello from {self.name}")
-            i += 1
-            if i >= 5:
-                self.quitquit.set()
+            data = self.schedule.source()
+            out += sock.sendto(data, self.schedule.ip_addr)
+            if out >= self.schedule.total:
+                break
 
 class UDPSender:
     def __init__(self) -> None:

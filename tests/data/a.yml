@@ -1,8 +1,10 @@
 ---
 - name: foo
-  target_addr: "1.1.1.1:44"
+  target_addr: "127.0.0.1"
+  target_port: 44000
   frequency: 1
   length: 100
-  source: random
+  source: file
   total: 1000
+  user_data1: "tst.txt"
 ...

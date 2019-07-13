@@ -79,8 +79,9 @@ MAX_PACKET_SIZE = 65500  # Find a better value, or make it configurable
 
 
 builtin_sources = {
-    "random": callables.gen_random,
-    "sequential": callables.UDPS_SequentialSource(),
+    "random": callables.UDPS_GenRandom,
+    "sequential": callables.UDPS_SequentialSource,
+    "file": callables.UDPS_FileSource
 }
 
 
@@ -108,10 +109,9 @@ class UDPSSchedule:
         self.name = validated["name"]
         self.tgt_addr = validated["target_addr"]
         self.tgt_port = validated["target_port"]
-        self.ip_addr = (self.tgt_addr, self.tgt_port)
+        self.ip_addr = (str(self.tgt_addr), self.tgt_port)
         self.frequency = validated["frequency"]
         self.length = self.validate_length(validated)
-        self.source = validated["source"]
         self.total = self.validate_total(validated)
 
         if "delay" in validated:
@@ -126,6 +126,8 @@ class UDPSSchedule:
 
         if "user_data2" in validated:
             self.user_data["user_data2"] = validated["user_data2"]
+
+        self.source = validated["source"](self)
 
     def validate_length(self, schema_data):
         """`length` can have a special value of `none`.
@@ -176,7 +178,7 @@ class UDPSSchedule:
                   f"    target_port: {self.tgt_port}",
                   f"    frequency:   {self.frequency} packets/sec",
                   f"    length:      {self.length} bytes/packet",
-                  f"    source:      {self.source.__name__}",
+                  f"    source:      {self.source.__class__.__name__}",
                   f"    total:       {self.total} bytes for all packets",
                   f"    delay:       {self.delay} sec"]
         udat = list()

@@ -31,7 +31,7 @@ def test_ok():
     assert sch.name == "foo"
     assert sch.tgt_addr == ipaddress.IPv4Address("1.1.1.1")
     assert sch.tgt_port == 44
-    assert sch.ip_addr == (ipaddress.IPv4Address("1.1.1.1"), 44)
+    assert sch.ip_addr == ("1.1.1.1", 44)
     assert sch.frequency == 1
     assert sch.length == 100
     assert sch.source == udpcalls.gen_random
