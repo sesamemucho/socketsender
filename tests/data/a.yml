@@ -3,8 +3,16 @@
   target_addr: "127.0.0.1"
   target_port: 44000
   frequency: 1
-  length: 100
+  length: 9
   source: file
-  total: 1000
-  user_data1: "tst.txt"
-...
+  total: 10
+  user_data1: "tests/data/a.txt"
+- name: foo
+  target_addr: "127.0.0.1"
+  target_port: 44000
+  frequency: 1
+  length: 9
+  source: file
+  total: 10
+  delay: 0.5
+  user_data1: "tests/data/b.txt"

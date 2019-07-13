@@ -20,8 +20,8 @@ target_port
   IP port number used as the destination of the UDP packets.
 
 frequency
-  In units of packets per second. It may be an integer or the name of
-  a function that returns an integer.
+  In units of packets per second. It may be a floating point or the name of
+  a function that returns a floating point.
 
 length
   Indicates the number of bytes to send per packet. A value of 'none'
@@ -196,7 +196,7 @@ schema = Schema(
         "name": And(str, len),
         "target_addr": Use(ipaddress.ip_address),
         "target_port": And(Use(int), lambda n: 0 <= n <= 65535),
-        "frequency": Or(callable, Const(And(Use(int), lambda n: 0 < n))),
+        "frequency": Or(callable, Const(And(Use(float), lambda n: 0 < n))),
         "length": Or("none", And(Use(int), lambda n: 0 < n)),
         "source": Or(Use(to_source), Use(from_callable)),
         "total": Or("infinity", And(Use(int), lambda n: 0 < n)),

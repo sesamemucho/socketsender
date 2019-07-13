@@ -27,15 +27,21 @@ class UDPSrunner(threading.Thread):
         i = 0
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        period = 1.0 / self.schedule.frequency
 
         time.sleep(self.schedule.delay)
-        this_time = time.time()
-        out = 0
+        number_of_packets_sent = 0
         while not self.quitquit.is_set():
+            last_time = time.time()
+            next_time = last_time + period
             data = self.schedule.source()
-            out += sock.sendto(data, self.schedule.ip_addr)
-            if out >= self.schedule.total:
+            sock.sendto(data, self.schedule.ip_addr)
+            number_of_packets_sent += 1
+            if number_of_packets_sent >= self.schedule.total:
                 break
+            wait_time = next_time - time.time()
+            if wait_time > 0.0:
+                time.sleep(wait_time)
 
 class UDPSender:
     def __init__(self) -> None:
@@ -43,7 +49,9 @@ class UDPSender:
 
     def run(self, stream: typing.TextIO) -> None:
         schedules = config.get_schedules(stream)
-        print(f"schedule: {schedules[0]}")
+        for sched in schedules:
+            print(f"schedule: {sched}")
+
         syncthreads = threading.Event()
         sch_threads = list()
         for sched in schedules:
