@@ -27,9 +27,9 @@ def test_genrandom():
     )
 
     sch = sched[0]
-    assert sch.source == udpcalls.gen_random
+    assert isinstance(sch.source, udpcalls.UDPS_GenRandom)
 
-    bstring = sch.source(sch, sch.length)
+    bstring = sch.source()
 
     assert len(bstring) == 100
 
@@ -50,9 +50,9 @@ def test_genrandom_lenNone():
     )
 
     sch = sched[0]
-    assert sch.source == udpcalls.gen_random
+    assert isinstance(sch.source, udpcalls.UDPS_GenRandom)
 
-    bstring = sch.source(sch, sch.length)
+    bstring = sch.source()
 
     assert len(bstring) == 128
 
@@ -75,7 +75,7 @@ def test_gensequential():
     sch = sched[0]
     assert isinstance(sch.source, udpcalls.UDPS_SequentialSource)
 
-    bstring = sch.source(sch, sch.length)
+    bstring = sch.source()
 
     assert len(bstring) == 140
 
@@ -98,6 +98,55 @@ def test_gensequential_lenNone():
     sch = sched[0]
     assert isinstance(sch.source, udpcalls.UDPS_SequentialSource)
 
-    bstring = sch.source(sch, sch.length)
+    bstring = sch.source()
 
     assert len(bstring) == 128
+
+def test_genfilesource():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "1.1.1.1"
+  target_port: 44
+  frequency: 1
+  length: 10
+  source: file
+  total: 1000
+  user_data1: "tests/data/a.txt"
+...
+        """
+    )
+
+    sch = sched[0]
+    assert isinstance(sch.source, udpcalls.UDPS_FileSource)
+
+    bstring = sch.source()
+
+    assert len(bstring) == 10
+
+
+def test_genfilesource_lenNone():
+    sched = config.get_schedules(
+        """
+---
+- name: foo
+  target_addr: "1.1.1.1"
+  target_port: 44
+  frequency: 1
+  length: none
+  source: file
+  total: 1000
+  user_data1: "tests/data/a.txt"
+...
+        """
+    )
+
+    sch = sched[0]
+    assert isinstance(sch.source, udpcalls.UDPS_FileSource)
+
+    bstring = sch.source()
+
+    assert len(bstring) == 128
+
+

@@ -8,6 +8,10 @@ import time
 import typing
 
 from udpsender import config
+import logging
+
+log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
 
 class UDPSrunner(threading.Thread):
     def __init__(self,
@@ -18,6 +22,7 @@ class UDPSrunner(threading.Thread):
         self.schedule = schedule
         self.run_request = run_request
         self.quitquit = threading.Event()
+        log.info("hello")
 
     def quit(self):
         self.quitquit.set()
@@ -45,21 +50,21 @@ class UDPSrunner(threading.Thread):
 
 class UDPSender:
     def __init__(self) -> None:
-        pass
+        self.threads = list()
 
     def run(self, stream: typing.TextIO) -> None:
         schedules = config.get_schedules(stream)
-        for sched in schedules:
-            print(f"schedule: {sched}")
-
         syncthreads = threading.Event()
-        sch_threads = list()
         for sched in schedules:
             sth = UDPSrunner(syncthreads, sched)
-            sch_threads.append(sth)
+            self.threads.append(sth)
             sth.start()
 
         syncthreads.set()
 
-        for sth in sch_threads:
+        for sth in self.threads:
             sth.join()
+
+    def stop_all(self):
+        for sth in self.threads:
+            sth.quit()
