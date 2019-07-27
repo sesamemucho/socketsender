@@ -1,22 +1,20 @@
 """Sends IP packets on a schedule.
 """
 
-import ipaddress
+import logging
 import socket
 import threading
 import time
 import typing
 
 from socketsender import config
-import logging
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
+
 class SOCSrunner(threading.Thread):
-    def __init__(self,
-                run_request: threading.Event,
-                schedule: config.SOCSSchedule):
+    def __init__(self, run_request: threading.Event, schedule: config.SOCSSchedule):
 
         super().__init__(name=schedule.name)
         self.schedule = schedule
@@ -24,12 +22,11 @@ class SOCSrunner(threading.Thread):
         self.quitquit = threading.Event()
         log.info("hello")
 
-    def quit(self):
+    def stop(self):
         self.quitquit.set()
 
     def run(self):
         self.run_request.wait()
-        i = 0
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         period = 1.0 / self.schedule.frequency
@@ -47,6 +44,7 @@ class SOCSrunner(threading.Thread):
             wait_time = next_time - time.time()
             if wait_time > 0.0:
                 time.sleep(wait_time)
+
 
 class SOCSender:
     def __init__(self) -> None:
@@ -67,4 +65,4 @@ class SOCSender:
 
     def stop_all(self):
         for sth in self.threads:
-            sth.quit()
+            sth.stop()

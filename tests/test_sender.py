@@ -1,23 +1,17 @@
 """
 Tests for `socketsender.sender` module.
 """
-import io
-import ipaddress
-import pprint
+import logging
+import select
 import socket
 import threading
-import time
-import sys
-import select
-
-import pytest
 
 from socketsender import sender
-import logging
 
 logging.basicConfig()
 
 FOO = None
+
 
 def do_test1(port=None):
     stream = f"""
@@ -42,6 +36,7 @@ def do_test1(port=None):
 ...
     """
     sender.SOCSender().run(stream)
+
 
 def do_test2(port=None):
     global FOO
@@ -69,6 +64,7 @@ def do_test2(port=None):
     FOO = sender.SOCSender()
     FOO.run(stream)
 
+
 def do_test3(port=None):
     global FOO
     stream = f"""
@@ -93,6 +89,7 @@ def do_test3(port=None):
     FOO = sender.SOCSender()
     FOO.run(stream)
 
+
 def test_ok():
     expected_data = (
         b"aaaaaaa0\n",
@@ -115,18 +112,19 @@ def test_ok():
         b"bbbbbbb8\n",
         b"aaaaaaa9\n",
         b"bbbbbbb9\n",
-        )
+    )
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('', 0))
+    sock.bind(("", 0))
 
     port = sock.getsockname()[1]
-    thr = threading.Thread(target=do_test1, kwargs={'port': port})
+    thr = threading.Thread(target=do_test1, kwargs={"port": port})
     thr.start()
 
     for i in range(0, 20):
         msg = sock.recv(1024)
         assert msg == expected_data[i]
+
 
 def test_stop_all():
     expected_data = (
@@ -150,14 +148,14 @@ def test_stop_all():
         b"bbbbbbb8\n",
         b"aaaaaaa9\n",
         b"bbbbbbb9\n",
-        )
+    )
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('', 0))
+    sock.bind(("", 0))
     sock.setblocking(0)
 
     port = sock.getsockname()[1]
-    thr = threading.Thread(target=do_test2, kwargs={'port': port})
+    thr = threading.Thread(target=do_test2, kwargs={"port": port})
     thr.start()
 
     for i in range(0, 5):
@@ -171,14 +169,15 @@ def test_stop_all():
             # Should time out after next call after i == 3
             assert i == 4
 
+
 def test_source_call_too_long():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('', 0))
+    sock.bind(("", 0))
 
     port = sock.getsockname()[1]
-    thr = threading.Thread(target=do_test3, kwargs={'port': port})
+    thr = threading.Thread(target=do_test3, kwargs={"port": port})
     thr.start()
 
     for i in range(0, 20):

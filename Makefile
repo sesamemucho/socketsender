@@ -30,7 +30,8 @@ test:
 	pytest --color=no --cov-report term-missing --cov=src --cov=tests tests
 
 isort:
-	isort --check-only --diff --recursive --skip .tox --skip .venv --skip build -m 3 -tc
+	#isort --check-only --diff --recursive --skip .tox --skip .venv --skip build -m 3 -tc
+	isort --multi-line=3 --trailing-comma --force-grid-wrap=0 --use-parentheses --line-width=88 --skip .venv --skip .tox --skip docs --check-only --diff --recursive
 
 test-all:
 	tox

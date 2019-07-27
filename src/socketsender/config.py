@@ -66,14 +66,13 @@ total
 
 import importlib
 import ipaddress
-import re
 import typing
 
 import yaml
 from schema import And, Const, Optional, Or, Schema, Use
-
 from socketsender import callables
-from socketsender import exceptions as uexc
+
+# from socketsender import exceptions as uexc
 
 MAX_PACKET_SIZE = 65500  # Find a better value, or make it configurable
 
@@ -81,7 +80,7 @@ MAX_PACKET_SIZE = 65500  # Find a better value, or make it configurable
 builtin_sources = {
     "random": callables.SOCS_GenRandom,
     "sequential": callables.SOCS_SequentialSource,
-    "file": callables.SOCS_FileSource
+    "file": callables.SOCS_FileSource,
 }
 
 
@@ -171,16 +170,17 @@ class SOCSSchedule:
 
         return retval
 
-
     def __str__(self):
-        retval = [f"SOCSchedule \"{self.name}\" is:",
-                  f"    target_addr: {self.tgt_addr}",
-                  f"    target_port: {self.tgt_port}",
-                  f"    frequency:   {self.frequency} packets/sec",
-                  f"    length:      {self.length} bytes/packet",
-                  f"    source:      {self.source.__class__.__name__}",
-                  f"    total:       {self.total} bytes for all packets",
-                  f"    delay:       {self.delay} sec"]
+        retval = [
+            f'SOCSchedule "{self.name}" is:',
+            f"    target_addr: {self.tgt_addr}",
+            f"    target_port: {self.tgt_port}",
+            f"    frequency:   {self.frequency} packets/sec",
+            f"    length:      {self.length} bytes/packet",
+            f"    source:      {self.source.__class__.__name__}",
+            f"    total:       {self.total} bytes for all packets",
+            f"    delay:       {self.delay} sec",
+        ]
         udat = list()
         if "user_data1" in self.user_data:
             udat.append(f"    user_data1 is \"{self.user_data['user_data1']}\"")
@@ -190,6 +190,7 @@ class SOCSSchedule:
             udat.append(f"    No user data has been defined")
         retval.extend(udat)
         return "\n".join(retval) + "\n"
+
 
 schema = Schema(
     {

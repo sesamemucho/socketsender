@@ -1,15 +1,12 @@
 """
 Tests for `socketsender.config` module.
 """
-import io
 import ipaddress
-import pprint
 
 import pytest
 import schema
-
 from socketsender import callables as udpcalls
-from socketsender import config, exceptions
+from socketsender import config
 
 
 def test_ok():
@@ -126,9 +123,9 @@ def test_total():
     assert sch.tgt_addr == ipaddress.IPv4Address("1.1.1.1")
     assert sch.tgt_port == 44
     assert sch.frequency == 1
-    assert sch.length is 100
+    assert sch.length == 100
     assert sch.source.__class__.__name__ == "SOCS_Test1"
-    assert sch.total == None
+    assert sch.total is None
 
     assert sch.total_compare(9999999999999) is False
 
@@ -205,7 +202,9 @@ def test_str():
     )
 
     sch = sched[0]
-    assert f"{sch}" == """SOCSchedule "foo" is:
+    assert (
+        f"{sch}"
+        == """SOCSchedule "foo" is:
     target_addr: 2001:db8::1
     target_port: 44
     frequency:   1 packets/sec
@@ -216,6 +215,7 @@ def test_str():
     user_data1 is "yep"
     user_data2 is "nope"
 """
+    )
 
 
 def test_str_nouserdata():
@@ -234,7 +234,9 @@ def test_str_nouserdata():
     )
 
     sch = sched[0]
-    assert f"{sch}" == """SOCSchedule "foo" is:
+    assert (
+        f"{sch}"
+        == """SOCSchedule "foo" is:
     target_addr: 2001:db8::1
     target_port: 44
     frequency:   1 packets/sec
@@ -244,6 +246,7 @@ def test_str_nouserdata():
     delay:       0.0 sec
     No user data has been defined
 """
+    )
 
 
 def test_user_data1():
@@ -311,7 +314,7 @@ def test_badIP1():
     """The IP Address must be a valid IPV4 address.
     """
     with pytest.raises(schema.SchemaError):
-        sched = config.get_schedules(
+        config.get_schedules(
             """
 ---
 - name: foo
@@ -330,7 +333,7 @@ def test_badfrequency():
     """frequency must be a postive number.
     """
     with pytest.raises(schema.SchemaError):
-        sched = config.get_schedules(
+        config.get_schedules(
             """
 ---
 - name: foo
@@ -349,7 +352,7 @@ def test_badlength():
     """length must be a postive number.
     """
     with pytest.raises(schema.SchemaError):
-        sched = config.get_schedules(
+        config.get_schedules(
             """
 ---
 - name: foo
@@ -368,7 +371,7 @@ def test_badsource():
     """source must be a callable or recognized string
     """
     with pytest.raises(schema.SchemaError):
-        sched = config.get_schedules(
+        config.get_schedules(
             """
 ---
 - name: foo
@@ -387,7 +390,7 @@ def test_badtotal1():
     """total must be 'infinity' or postive number.
     """
     with pytest.raises(schema.SchemaError):
-        sched = config.get_schedules(
+        config.get_schedules(
             """
 ---
 - name: foo
@@ -406,7 +409,7 @@ def test_badtotal2():
     """total must be 'infinity' or postive number.
     """
     with pytest.raises(schema.SchemaError):
-        sched = config.get_schedules(
+        config.get_schedules(
             """
 ---
 - name: foo

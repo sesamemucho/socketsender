@@ -1,14 +1,9 @@
 """
 Tests for `socketsender.callables` module.
 """
-import io
-import pprint
-
-import pytest
-import schema
 
 from socketsender import callables as udpcalls
-from socketsender import config, exceptions
+from socketsender import config
 
 
 def test_genrandom():
@@ -102,6 +97,7 @@ def test_gensequential_lenNone():
 
     assert len(bstring) == 128
 
+
 def test_genfilesource():
     sched = config.get_schedules(
         """
@@ -127,7 +123,7 @@ def test_genfilesource():
 
 
 def test_genfilesource_lenNone():
-    sched = config.get_schedules(
+    sch = config.get_schedules(
         """
 ---
 - name: foo
@@ -140,13 +136,10 @@ def test_genfilesource_lenNone():
   user_data1: "tests/data/a.txt"
 ...
         """
-    )
+    )[0]
 
-    sch = sched[0]
     assert isinstance(sch.source, udpcalls.SOCS_FileSource)
 
     bstring = sch.source()
 
     assert len(bstring) == 128
-
-
