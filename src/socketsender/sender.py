@@ -1,4 +1,4 @@
-"""Sends UDP packets on a schedule.
+"""Sends IP packets on a schedule.
 """
 
 import ipaddress
@@ -7,16 +7,16 @@ import threading
 import time
 import typing
 
-from udpsender import config
+from socketsender import config
 import logging
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
-class UDPSrunner(threading.Thread):
+class SOCSrunner(threading.Thread):
     def __init__(self,
                 run_request: threading.Event,
-                schedule: config.UDPSSchedule):
+                schedule: config.SOCSSchedule):
 
         super().__init__(name=schedule.name)
         self.schedule = schedule
@@ -48,7 +48,7 @@ class UDPSrunner(threading.Thread):
             if wait_time > 0.0:
                 time.sleep(wait_time)
 
-class UDPSender:
+class SOCSender:
     def __init__(self) -> None:
         self.threads = list()
 
@@ -56,7 +56,7 @@ class UDPSender:
         schedules = config.get_schedules(stream)
         syncthreads = threading.Event()
         for sched in schedules:
-            sth = UDPSrunner(syncthreads, sched)
+            sth = SOCSrunner(syncthreads, sched)
             self.threads.append(sth)
             sth.start()
 

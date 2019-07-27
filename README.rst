@@ -1,14 +1,14 @@
-=============================
-UDP Packet Sender
-=============================
+================
+IP Packet Sender
+================
 
-.. image:: https://badge.fury.io/py/udpsender.png
-    :target: http://badge.fury.io/py/udpsender
+.. image:: https://badge.fury.io/py/socketsender.png
+    :target: http://badge.fury.io/py/socketsender
 
-.. image:: https://travis-ci.org/sesamemucho/udpsender.png?branch=master
-    :target: https://travis-ci.org/sesamemucho/udpsender
+.. image:: https://travis-ci.org/sesamemucho/socketsender.png?branch=master
+    :target: https://travis-ci.org/sesamemucho/socketsender
 
-Send different-sized UDP packets to various places one or more schedules.
+Send different-sized IP packets to various places on one or more schedules.
 
 
 Features

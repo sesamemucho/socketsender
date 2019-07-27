@@ -7,7 +7,7 @@ source =
 branch = true
 parallel = true
 source =
-    udpsender
+    socketsender
     tests
 
 [report]

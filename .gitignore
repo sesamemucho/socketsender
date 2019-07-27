@@ -12,9 +12,9 @@ bin/
 docs/_build/
 .pytest_cache/
 __pycache__
-src/udpsender.egg-info/
+src/socketsender.egg-info/
 docs/modules.rst
-docs/udpsender.rst
+docs/socketsender.rst
 .mypy_cache/
 build/
 dist/

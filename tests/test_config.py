@@ -1,5 +1,5 @@
 """
-Tests for `udpsender.config` module.
+Tests for `socketsender.config` module.
 """
 import io
 import ipaddress
@@ -8,8 +8,8 @@ import pprint
 import pytest
 import schema
 
-from udpsender import callables as udpcalls
-from udpsender import config, exceptions
+from socketsender import callables as udpcalls
+from socketsender import config, exceptions
 
 
 def test_ok():
@@ -34,7 +34,7 @@ def test_ok():
     assert sch.ip_addr == ("1.1.1.1", 44)
     assert sch.frequency == 1
     assert sch.length == 100
-    assert isinstance(sch.source, udpcalls.UDPS_GenRandom)
+    assert isinstance(sch.source, udpcalls.SOCS_GenRandom)
     assert sch.total == 1000
     assert sch.delay == pytest.approx(0.0)
     assert sch.user_data == dict()
@@ -57,7 +57,7 @@ def test_source():
   target_port: 44
   frequency: 1
   length: 100
-  source: tests.callables.UDPS_Test1
+  source: tests.callables.SOCS_Test1
   total: 1000
 ...
         """
@@ -69,7 +69,7 @@ def test_source():
     assert sch.tgt_port == 44
     assert sch.frequency == 1
     assert sch.length == 100
-    assert sch.source.__class__.__name__ == "UDPS_Test1"
+    assert sch.source.__class__.__name__ == "SOCS_Test1"
     assert sch.total == 1000
 
     assert sch.source() == b"Hello"
@@ -86,7 +86,7 @@ def test_length():
   target_port: 44
   frequency: 1
   length: none
-  source: tests.callables.UDPS_Test1
+  source: tests.callables.SOCS_Test1
   total: 1000
 ...
         """
@@ -98,7 +98,7 @@ def test_length():
     assert sch.tgt_port == 44
     assert sch.frequency == 1
     assert sch.length is None
-    assert sch.source.__class__.__name__ == "UDPS_Test1"
+    assert sch.source.__class__.__name__ == "SOCS_Test1"
     assert sch.total == 1000
 
     assert sch.length_compare(9999999999999) is False
@@ -115,7 +115,7 @@ def test_total():
   target_port: 44
   frequency: 1
   length: 100
-  source: tests.callables.UDPS_Test1
+  source: tests.callables.SOCS_Test1
   total: infinity
 ...
         """
@@ -127,7 +127,7 @@ def test_total():
     assert sch.tgt_port == 44
     assert sch.frequency == 1
     assert sch.length is 100
-    assert sch.source.__class__.__name__ == "UDPS_Test1"
+    assert sch.source.__class__.__name__ == "SOCS_Test1"
     assert sch.total == None
 
     assert sch.total_compare(9999999999999) is False
@@ -155,7 +155,7 @@ def test_delay():
     assert sch.tgt_port == 44
     assert sch.frequency == 1
     assert sch.length == 100
-    assert isinstance(sch.source, udpcalls.UDPS_GenRandom)
+    assert isinstance(sch.source, udpcalls.SOCS_GenRandom)
     assert sch.total == 1000
     assert sch.delay == pytest.approx(4.2)
 
@@ -205,12 +205,12 @@ def test_str():
     )
 
     sch = sched[0]
-    assert f"{sch}" == """UDPSchedule "foo" is:
+    assert f"{sch}" == """SOCSchedule "foo" is:
     target_addr: 2001:db8::1
     target_port: 44
     frequency:   1 packets/sec
     length:      100 bytes/packet
-    source:      UDPS_GenRandom
+    source:      SOCS_GenRandom
     total:       1000 bytes for all packets
     delay:       0.0 sec
     user_data1 is "yep"
@@ -234,12 +234,12 @@ def test_str_nouserdata():
     )
 
     sch = sched[0]
-    assert f"{sch}" == """UDPSchedule "foo" is:
+    assert f"{sch}" == """SOCSchedule "foo" is:
     target_addr: 2001:db8::1
     target_port: 44
     frequency:   1 packets/sec
     length:      100 bytes/packet
-    source:      UDPS_GenRandom
+    source:      SOCS_GenRandom
     total:       1000 bytes for all packets
     delay:       0.0 sec
     No user data has been defined

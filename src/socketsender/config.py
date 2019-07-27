@@ -72,16 +72,16 @@ import typing
 import yaml
 from schema import And, Const, Optional, Or, Schema, Use
 
-from udpsender import callables
-from udpsender import exceptions as uexc
+from socketsender import callables
+from socketsender import exceptions as uexc
 
 MAX_PACKET_SIZE = 65500  # Find a better value, or make it configurable
 
 
 builtin_sources = {
-    "random": callables.UDPS_GenRandom,
-    "sequential": callables.UDPS_SequentialSource,
-    "file": callables.UDPS_FileSource
+    "random": callables.SOCS_GenRandom,
+    "sequential": callables.SOCS_SequentialSource,
+    "file": callables.SOCS_FileSource
 }
 
 
@@ -97,9 +97,9 @@ def from_callable(c):
     return getattr(mod, func)
 
 
-class UDPSSchedule:
+class SOCSSchedule:
     def __init__(self, data: dict) -> None:
-        """Build a UDPsender Schedule from a configuration section.
+        """Build a SOCSender Schedule from a configuration section.
 
         First, we validate using `schema` and a schema.
         Then, we must interpret some of the values.
@@ -146,7 +146,7 @@ class UDPSSchedule:
             def length_compare(_, current_length: int) -> bool:
                 return current_length < length
 
-        setattr(UDPSSchedule, "length_compare", length_compare)
+        setattr(SOCSSchedule, "length_compare", length_compare)
 
         return retval
 
@@ -167,13 +167,13 @@ class UDPSSchedule:
             def total_compare(_, current_total: int) -> bool:
                 return current_total < total
 
-        setattr(UDPSSchedule, "total_compare", total_compare)
+        setattr(SOCSSchedule, "total_compare", total_compare)
 
         return retval
 
 
     def __str__(self):
-        retval = [f"UDPSchedule \"{self.name}\" is:",
+        retval = [f"SOCSchedule \"{self.name}\" is:",
                   f"    target_addr: {self.tgt_addr}",
                   f"    target_port: {self.tgt_port}",
                   f"    frequency:   {self.frequency} packets/sec",
@@ -207,7 +207,7 @@ schema = Schema(
 )
 
 
-def get_schedules(stream: typing.TextIO) -> typing.List[UDPSSchedule]:
+def get_schedules(stream: typing.TextIO) -> typing.List[SOCSSchedule]:
     # max_packet_size = 65500
     data: list = yaml.safe_load(stream)
-    return [UDPSSchedule(i) for i in data]
+    return [SOCSSchedule(i) for i in data]

@@ -2,7 +2,7 @@ import array
 import random
 
 
-class UDPS_GenRandom:
+class SOCS_GenRandom:
     def __init__(self, sched: object) -> None:
         self.sched = sched
         if sched.length is None:
@@ -20,7 +20,7 @@ class UDPS_GenRandom:
         return retval.tobytes()
 
 
-class UDPS_SequentialSource:
+class SOCS_SequentialSource:
     def __init__(self, sched: object) -> None:
         self.sched = sched
         self.starting_value = 0
@@ -40,7 +40,7 @@ class UDPS_SequentialSource:
         return retval.tobytes()
 
 
-class UDPS_FileSource:
+class SOCS_FileSource:
     def __init__(self, sched: object) -> None:
         self.sched = sched
         if sched.length is None:

@@ -1,5 +1,5 @@
 """
-Tests for `udpsender.sender` module.
+Tests for `socketsender.sender` module.
 """
 import io
 import ipaddress
@@ -12,7 +12,7 @@ import select
 
 import pytest
 
-from udpsender import sender
+from socketsender import sender
 import logging
 
 logging.basicConfig()
@@ -41,7 +41,7 @@ def do_test1(port=None):
   user_data1: "tests/data/b.txt"
 ...
     """
-    sender.UDPSender().run(stream)
+    sender.SOCSender().run(stream)
 
 def do_test2(port=None):
     global FOO
@@ -66,7 +66,7 @@ def do_test2(port=None):
   user_data1: "tests/data/b.txt"
 ...
     """
-    FOO = sender.UDPSender()
+    FOO = sender.SOCSender()
     FOO.run(stream)
 
 def do_test3(port=None):
@@ -78,19 +78,19 @@ def do_test3(port=None):
   target_port: {port}
   frequency: 2
   length: 5
-  source: tests.callables.UDPS_Test2
+  source: tests.callables.SOCS_Test2
   total: 10
 - name: boo
   target_addr: "127.0.0.1"
   target_port: {port}
   frequency: 2
   length: 5
-  source: tests.callables.UDPS_Test2
+  source: tests.callables.SOCS_Test2
   total: 10
   delay: 0.25
 ...
     """
-    FOO = sender.UDPSender()
+    FOO = sender.SOCSender()
     FOO.run(stream)
 
 def test_ok():

@@ -1,5 +1,5 @@
 """
-Tests for `udpsender.callables` module.
+Tests for `socketsender.callables` module.
 """
 import io
 import pprint
@@ -7,8 +7,8 @@ import pprint
 import pytest
 import schema
 
-from udpsender import callables as udpcalls
-from udpsender import config, exceptions
+from socketsender import callables as udpcalls
+from socketsender import config, exceptions
 
 
 def test_genrandom():
@@ -27,7 +27,7 @@ def test_genrandom():
     )
 
     sch = sched[0]
-    assert isinstance(sch.source, udpcalls.UDPS_GenRandom)
+    assert isinstance(sch.source, udpcalls.SOCS_GenRandom)
 
     bstring = sch.source()
 
@@ -50,7 +50,7 @@ def test_genrandom_lenNone():
     )
 
     sch = sched[0]
-    assert isinstance(sch.source, udpcalls.UDPS_GenRandom)
+    assert isinstance(sch.source, udpcalls.SOCS_GenRandom)
 
     bstring = sch.source()
 
@@ -73,7 +73,7 @@ def test_gensequential():
     )
 
     sch = sched[0]
-    assert isinstance(sch.source, udpcalls.UDPS_SequentialSource)
+    assert isinstance(sch.source, udpcalls.SOCS_SequentialSource)
 
     bstring = sch.source()
 
@@ -96,7 +96,7 @@ def test_gensequential_lenNone():
     )
 
     sch = sched[0]
-    assert isinstance(sch.source, udpcalls.UDPS_SequentialSource)
+    assert isinstance(sch.source, udpcalls.SOCS_SequentialSource)
 
     bstring = sch.source()
 
@@ -119,7 +119,7 @@ def test_genfilesource():
     )
 
     sch = sched[0]
-    assert isinstance(sch.source, udpcalls.UDPS_FileSource)
+    assert isinstance(sch.source, udpcalls.SOCS_FileSource)
 
     bstring = sch.source()
 
@@ -143,7 +143,7 @@ def test_genfilesource_lenNone():
     )
 
     sch = sched[0]
-    assert isinstance(sch.source, udpcalls.UDPS_FileSource)
+    assert isinstance(sch.source, udpcalls.SOCS_FileSource)
 
     bstring = sch.source()
 

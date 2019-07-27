@@ -39,9 +39,9 @@ format:
 	black tests src
 
 docs:
-	rm -f docs/udpsender.rst
+	rm -f docs/socketsender.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ src/udpsender
+	sphinx-apidoc -o docs/ src/socketsender
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 #	open docs/_build/html/index.html

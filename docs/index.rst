@@ -17,14 +17,14 @@ Contents:
    authors
    history
 
-   udpsender
+   socketsender
    modules
 
 Feedback
 ========
 
-If you have any suggestions or questions about **UDP Packet Sender** feel free to email me
+If you have any suggestions or questions about **IP Packet Sender** feel free to email me
 at sesamemucho@grumpydogconsulting.com.
 
-If you encounter any errors or problems with **UDP Packet Sender**, please let me know!
-Open an Issue at the GitHub http://github.com/sesamemucho/udpsender main repository.
+If you encounter any errors or problems with **IP Packet Sender**, please let me know!
+Open an Issue at the GitHub http://github.com/sesamemucho/socketsender main repository.
