@@ -1,5 +1,5 @@
 ---
-- name: foo
+- name: foo1
   target_addr: "127.0.0.1"
   target_port: 44000
   frequency: 1
@@ -7,7 +7,7 @@
   source: file
   total: 10
   user_data1: "tests/data/a.txt"
-- name: foo
+- name: foo2
   target_addr: "127.0.0.1"
   target_port: 44000
   frequency: 1
