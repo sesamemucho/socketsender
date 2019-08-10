@@ -199,7 +199,7 @@ schema = Schema(
         "target_port": And(Use(int), lambda n: 0 <= n <= 65535),
         "frequency": Or(callable, Const(And(Use(float), lambda n: 0 < n))),
         "length": Or("none", And(Use(int), lambda n: 0 < n)),
-        "source": Or(Use(to_source), Use(from_callable)),
+        "source": Or(callable, Use(to_source), Use(from_callable)),
         "total": Or("infinity", And(Use(int), lambda n: 0 < n)),
         Optional("delay"): And(Or(int, float), Use(float), lambda f: f > 0.0),
         Optional("user_data1"): str,

@@ -7,8 +7,8 @@ import select
 import signal
 import socket
 import threading
-
 from multiprocessing import Process
+
 from socketsender import sender
 
 logging.basicConfig()

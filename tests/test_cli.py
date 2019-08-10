@@ -3,19 +3,9 @@ Tests for `socketsender.app.cli` module.
 """
 import logging
 import os
-
-# import select
-# import signal
 import socket
 import subprocess
-
-# import sys
 import tempfile
-
-# import threading
-
-# from multiprocessing import Process
-# from socketsender import sender
 
 logging.basicConfig()
 
@@ -43,6 +33,23 @@ def mktemp1(port=None):
   delay: 0.01
   user_data1: "tests/data/b.txt"
 ...
+    """
+    of, fname = tempfile.mkstemp()
+    os.write(of, stream.encode())
+    os.close(of)
+    return fname
+
+
+def mktemp2(port=None):
+    stream = f"""
+---
+- name: foo
+  target_addr: "127.0.0.1"
+  target_port: {port}
+  frequency: 20
+  length: none
+  source: welp.Foo
+  total: 10
     """
     of, fname = tempfile.mkstemp()
     os.write(of, stream.encode())
@@ -134,11 +141,55 @@ def test_ok():
 
     subprocess.Popen(["socketsender", fname], executable="socketsender")
 
+    for i in range(0, 20):
+        msg = sock.recv(1024)
+        assert msg == expected_data[i]
+
+    os.unlink(fname)
+
+
+def test_module():
+    expected_data = (
+        b"Welp0\n",
+        b"Welp1\n",
+        b"Welp2\n",
+        b"Welp3\n",
+        b"Welp4\n",
+        b"Welp5\n",
+        b"Welp6\n",
+        b"Welp7\n",
+        b"Welp8\n",
+        b"Welp9\n",
+    )
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind(("", 0))
+
+    port = sock.getsockname()[1]
+    fname = mktemp2(port)
+
+    subprocess.Popen(
+        ["socketsender", "--module", os.path.join("tests", "data", "welp.py"), fname],
+        executable="socketsender",
+    )
+
     for i in range(0, 10):
         msg = sock.recv(1024)
         assert msg == expected_data[i]
 
     os.unlink(fname)
+
+
+def test_bad_module():
+    sb = subprocess.run(
+        [
+            "socketsender",
+            "--module",
+            os.path.join("tests", "data", "gubber.py"),
+            os.path.join("tests", "data", "welp.py"),
+        ]
+    )
+    assert sb.returncode == 3
 
 
 # def test_kbint():
