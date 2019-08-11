@@ -19,5 +19,9 @@ whatever data is desired.
 Features
 --------
 
-* TODO
+The destination, length, frequency, and other characteristics of the
+packets are configurable (See :ref:`Configuration` for details).
 
+The capabilities of this package may be accessed either through the
+module :py:mod:`socketsender` or through the CLI application of the
+same name (:py:mod:`socketsender.app`).

@@ -1,5 +1,7 @@
 """
 
+.. _Configuration:
+
 Configuration
 =============
 
@@ -14,10 +16,10 @@ name
   The name of this schedule. It is used in reporting,
 
 target_addr
-  IP address address used as the destination of the UDP packets.
+  IP address address used as the destination of the packets.
 
 target_port
-  IP port number used as the destination of the UDP packets.
+  IP port number used as the destination of the packets.
 
 frequency
   In units of packets per second. It may be a floating point or the name of
@@ -27,7 +29,7 @@ length
   Indicates the number of bytes to send per packet. A value of 'none'
   means to send all the bytes supplied by `source`. Otherwise, it may
   be a positive integer or the name of a function that returns such an
-  integer. Will be automatically reduced to maintain `frequency`.
+  integer.
 
 source
   The source of the bytes to send. It may be a special string (see
